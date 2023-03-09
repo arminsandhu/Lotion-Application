@@ -24,12 +24,12 @@ const headerWrapperTitle = {
 };
 
 
-const Header = () => {
+const Header = ({showSidebar, setSidebar}) => {
     
     return (
         <div style={headerWrapper}>
         <div style={headerWrapperButton}>
-            <button id="menu">&#9776;</button>
+            <button id="menu" onClick={() => setSidebar(!showSidebar)}>&#9776;</button>
         </div>
         <div style={headerWrapperTitle}>
             <h1>

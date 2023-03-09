@@ -1,6 +1,5 @@
 import NotesWrapper from './NotesWrapper'
 import MainWrapper from './MainWrapper'
-import Header from './Header'
 import React, { useState } from "react";
 import uuid from 'react-uuid';
 import ReactDOM from 'react-dom/client';
@@ -12,15 +11,11 @@ const bodyWrapper = {
     flexDirection: "row"
 };
 
+const Body = ( {showSidebar} ) => {
+    const [notes, setNotes] = useState(JSON.parse(localStorage.getItem("notes")) || []) ;
 
+    const [currentNote, setCurrent] = useState(null);
 
-const Body = ( ) => {
-    const [notes, setNotes] = useState([]);
-
-    const [currentNote, setCurrent] = useState(false);
-  
-
-  
     const addNewNote = () => {
       const newNote = {
         id: uuid(),
@@ -33,30 +28,58 @@ const Body = ( ) => {
   
     };
 
-
     const getCurrentNote = () => {
-        return notes.find((note) => note.id === currentNote.id);
-      };
-
-
+      return notes.find((note) => note.id === currentNote);
+    };
 
     const updateNote = (theUpdated) => {
-        const updatedArray = notes.map((note) => {
-          if(note.id === currentNote.id) {
+      setNotes((prevNotes) => {
+        return prevNotes.map(note => {
+          if(note.id === theUpdated.id){
             return theUpdated;
           }
           return note;
-        });
-      setNotes(updatedArray);
+        })
+      })
     }
 
+    const delNote = (theDeleted) => { 
+      const savedNotes = JSON.parse(localStorage.getItem("notes")) || [];
+      const noteToDeleteExists = savedNotes.some(note => note.id === theDeleted);
+      if(noteToDeleteExists) {
+        localStorage.setItem("notes", JSON.stringify(savedNotes.filter((note) => note.id !== theDeleted)))
+      }
+      setNotes(notes.filter((note) => note.id !== theDeleted))
+    }
 
+    const saveNotes = (theSaved) => {
+      const preSavedNotes = JSON.parse(localStorage.getItem("notes"));
+      var notesToSave;
+      if(preSavedNotes) {
+        const newNoteToSaveExists = preSavedNotes.some(note => note.id === theSaved.id);
+        if(newNoteToSaveExists){
+          notesToSave = preSavedNotes.map((note) => {
+            if(note.id === theSaved.id){
+              return theSaved;
+            }
+            return note;
+          })
+        }else{
+          notesToSave = [theSaved, ...preSavedNotes]
+        }
+      }else{
+        notesToSave = [theSaved];
+      }
 
+      localStorage.setItem("notes", JSON.stringify(notesToSave))
+    }
+
+    
 
     return(
     <div style={bodyWrapper}>
-        <NotesWrapper notes={notes} addNewNote={addNewNote} currentNote={currentNote} setCurrent={setCurrent}/>
-        <MainWrapper currentNote={getCurrentNote} updateNote={updateNote}/>
+        {showSidebar && <NotesWrapper notes={notes} addNewNote={addNewNote} currentNote={currentNote} setCurrent={setCurrent}/>}
+        <MainWrapper currentNote={getCurrentNote()} updateNote={updateNote} delNote={delNote} saveNotes={saveNotes}/>
     </div>
     )
 }

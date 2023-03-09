@@ -5,7 +5,8 @@ const notesWrapper = {
     flex: "1",
     display: "flex",
     flexDirection: "column",
-    borderRight: "2px solid #f2f2f2f5"
+    borderRight: "2px solid #f2f2f2f5",
+    maxWidth: "350px",
 };
 
 const topNotes = {
