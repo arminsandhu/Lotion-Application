@@ -6,7 +6,7 @@ const notesWrapper = {
     display: "flex",
     flexDirection: "column",
     borderRight: "2px solid #f2f2f2f5",
-    maxWidth: "350px",
+    maxWidth: "280px",
 };
 
 const topNotes = {
@@ -70,7 +70,7 @@ function NotesWrapper ( {notes, addNewNote, currentNote, setCurrent} ) {
                             Last modified {formatDate(oneNote.lastModified)}
                         </small>
                         <p>
-                            {oneNote.body && oneNote.body.substr(0,100) + "..."}
+                            {oneNote.body && oneNote.body.replace(/<[^>]+>/g, '').substr(0,20) + "..."}
                         </p>
                     </div>
                 ))}

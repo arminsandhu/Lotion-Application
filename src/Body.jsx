@@ -1,8 +1,8 @@
 import NotesWrapper from './NotesWrapper'
 import MainWrapper from './MainWrapper'
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import uuid from 'react-uuid';
-import ReactDOM from 'react-dom/client';
+import { useNavigate, useParams } from "react-router-dom";
 
 const bodyWrapper = {
     height: "100%",
@@ -13,23 +13,37 @@ const bodyWrapper = {
 
 const Body = ( {showSidebar} ) => {
     const [notes, setNotes] = useState(JSON.parse(localStorage.getItem("notes")) || []) ;
+    
+    let { id } = useParams();
 
-    const [currentNote, setCurrent] = useState(null);
+    const [currentNote, setCurrent] = useState(id);
+
+    
+
+    const navigate = useNavigate();
+
+
+    useEffect(() => {
+      
+      if(currentNote) 
+      navigate("/notes/" + currentNote + "/edit")
+    }, [currentNote])
 
     const addNewNote = () => {
       const newNote = {
         id: uuid(),
         title: "Untitled",
         lastModified: Date.now(),
-        body: "...",
+        body: "",
       };
       setNotes([newNote, ...notes])
       setCurrent(newNote.id)
   
-    };
+    };  
 
     const getCurrentNote = () => {
       return notes.find((note) => note.id === currentNote);
+      
     };
 
     const updateNote = (theUpdated) => {
@@ -44,15 +58,22 @@ const Body = ( {showSidebar} ) => {
     }
 
     const delNote = (theDeleted) => { 
-      const savedNotes = JSON.parse(localStorage.getItem("notes")) || [];
-      const noteToDeleteExists = savedNotes.some(note => note.id === theDeleted);
-      if(noteToDeleteExists) {
-        localStorage.setItem("notes", JSON.stringify(savedNotes.filter((note) => note.id !== theDeleted)))
+      const answer = window.confirm("Are you sure?");
+      if (answer) {
+
+        const savedNotes = JSON.parse(localStorage.getItem("notes")) || [];
+        const noteToDeleteExists = savedNotes.some(note => note.id === theDeleted);
+        if(noteToDeleteExists) {
+          localStorage.setItem("notes", JSON.stringify(savedNotes.filter((note) => note.id !== theDeleted)))
+        }
+        setNotes(notes.filter((note) => note.id !== theDeleted))
       }
-      setNotes(notes.filter((note) => note.id !== theDeleted))
     }
 
     const saveNotes = (theSaved) => {
+      console.log(theSaved)
+      // currentNote.body = theSaved.body
+      
       const preSavedNotes = JSON.parse(localStorage.getItem("notes"));
       var notesToSave;
       if(preSavedNotes) {
@@ -70,7 +91,6 @@ const Body = ( {showSidebar} ) => {
       }else{
         notesToSave = [theSaved];
       }
-
       localStorage.setItem("notes", JSON.stringify(notesToSave))
     }
 
